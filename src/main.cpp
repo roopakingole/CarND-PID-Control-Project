@@ -35,10 +35,13 @@ int main() {
 
   PID pid;
   bool twiddle = false;
-    double p[3] = {0.07, 0.00021, 1.35};
+    //double p[3] = {0.2, 0.004, 2.0};
+    //double p[3] = {0.145, 0.00125, 8.51561};
+    //double p[3] = {0.134611, 0.000270736, 3.05349};
+    double p[3] = {0.152937, 7.89867e-05, 3.15709};
     double dp[3] = {.01, .0001, .1};
     int n = 0;
-    int max_n = 600;
+    int max_n = 1000;
     double total_cte = 0.0;
     double error = 0.0;
     double best_error = 100000.00;
@@ -58,7 +61,10 @@ int main() {
   }else {
     //pid.Init(0.100801, 0.0002, 1.35);
     //pid.Init(0.135, 0.0015, 8.51561);
-    pid.Init(0.05, 0.0001, 1.5);
+    //pid.Init(0.145, 0.00125, 9.51561);
+    //pid.Init(0.134611, 0.000270736, 3.05349);
+    pid.Init(0.152937, 7.89867e-05, 3.15709);
+    //pid.Init(0.2, 0.004, 3.0);
   }
 
   h.onMessage([&pid, &p, &dp, &n, &max_n, &tol, &error, &best_error, &p_iterator, &total_iterator, &total_cte, &first, &sub_move, &second, &twiddle, &best_p](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
