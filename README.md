@@ -1,6 +1,12 @@
 # CarND-Controls-PID
 Self-Driving Car Engineer Nanodegree Program
 
+## The Project
+
+In this project a PID controller is to be implemented to maneuver the vehicle around the track in the simulator.
+
+The simulator provides the cross track error (CTE) and the velocity (mph) and current steering angle. This data is used to compute the appropriate steering angle and throttle.
+
 ---
 
 ## Dependencies
@@ -37,62 +43,74 @@ Fellow students have put together a guide to Windows set-up for the project [her
 
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
 
-## Editor Settings
+## Project Rubric
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+### Cross Track Error
+A cross track error is a distance of the vehicle from trajectory. In theory it’s best suited to control the car by steering in proportion to Cross Track Error(CTE).
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+#### P component
+It sets the steering angle in proportion to CTE with a proportional factor tau. This causes car to steer in proportional to the error in the opposite direction of the error.
+```
+-tau * cte
+```
 
-## Code Style
+#### I Component:
+It’s the integral or sum of error to deal with systematic biases.
+```
+int_cte += cte
+tau_i * int_cte
+```
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+#### D component:
+It’s the differential component of the controller which helps to take temporal derivative of error. This means when the car turned enough to reduce the error, it will help not to overshoot through the x axis.
+```
+diff_cte = cte - prev_cte
+prev_cte = cte
+- tau_d * diff_cte
+```
 
-## Project Instructions and Rubric
+Total Error is calculated as below formula. Basically summing up all the errors.
+```
+(-tau_p * cte) - (tau_i * int_cte) - (tau_d * diff_cte)
+```
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+Kp, Ki & Kd for PID class are initialized in PID::Init() along with resetting the individual errors.
 
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
+```
+void PID::Init(double Kp_, double Ki_, double Kd_) {
+	Kp = Kp_;
+	Ki = Ki_;
+	Kd = Kd_;
+	p_error = 0;
+	i_error = 0;
+	d_error = 0;
+}
+```
 
-## Hints!
+Error are updated at each step as per below code:
 
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
+```
+void PID::UpdateError(double cte) {
+    d_error = cte - p_error;
+    p_error = cte;
+    i_error += cte;
+}
+```
 
-## Call for IDE Profiles Pull Requests
+```
+double PID::TotalError() {
+  return (-Kp * p_error) - (Ki * i_error) - (Kd * d_error);
+}
+```
 
-Help your fellow students!
+Initially, the hyperparameters were chosen randomly with trial and error method to see if car can drive with less oscillation.
+Initial hyperparameters: (Kp,Ki,Kd) = (0.135, 0.0002, 3.0)
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
+[![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/hqdefault.jpg)](https://youtu.be/T-D1KVIuvjA)
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+After this I ran the twiddle algorithm to fine tune the gains. After around 400 interations, final hyperparameters were chosen.
+Final hyperparameters: (Kp,Ki,Kd) = (0.152937, 7.89867e-05, 3.15709)
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+[![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/hqdefault.jpg)](https://youtu.be/T-D1KVIuvjA)
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
 
