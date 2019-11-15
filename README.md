@@ -106,7 +106,7 @@ double PID::TotalError() {
 Initially, the hyperparameters were chosen randomly with trial and error method to see if car can drive with less oscillation.
 Initial hyperparameters: (Kp,Ki,Kd) = (0.135, 0.0002, 3.0)
 
-[![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/hqdefault.jpg)](https://youtu.be/T-D1KVIuvjA)
+[![Watch the video](https://img.youtube.com/vi/0C3fenE10Zo/hqdefault.jpg)](https://youtu.be/0C3fenE10Zo)
 
 After this I ran the twiddle algorithm to fine tune the gains. After around 400 interations, final hyperparameters were chosen.
 Final hyperparameters: (Kp,Ki,Kd) = (0.152937, 7.89867e-05, 3.15709)
